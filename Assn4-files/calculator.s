@@ -5,12 +5,12 @@
 # 301425444
 # Oct. 13 2021
 
-	.globl	XX # Make sure you change the name of this function - see XX function below
+	.globl	lessThan
 	.globl	plus
 	.globl	minus
 	.globl	mul
 
-# x in edi, y in esi
+# x in %edi, y in %esi
 
 lessThan: # checks whether x is less than y, returns 1 if true, 0 otherwise
 	# x -> %edi, y -> %esi, return %eax
