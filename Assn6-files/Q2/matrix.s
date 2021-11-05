@@ -51,11 +51,13 @@ doneWithRows:				# bye! bye!
 
 #########################################################################################
 	.globl	transpose
-transpose:		# transposes NxN matrix C -> %rsi, N -> %edx
+transpose:		
+# transposes NxN matrix C -> %rsi, N -> %edx
 # will use caller-saved registers rcx and r8 for i and j respectively
 	xorl	%ecx, %ecx		# starts with i = 0
 	xorl	%r8d, %r8d		# starts with j = 0
 	pushq	%r12			# want to use callee-saved r12 for temp entry
+	pushq	%r13			# want to use callee-saved r13 for temp entry
 
 nextCol:
 	incl	%r8d			# j++
@@ -83,12 +85,15 @@ switchEntries:
 	imull	$1, %r11d			# r11 = L * (i + j*N) -> L is char (1 Byte)
 	addq	%rsi, %r10			# r10 = C + L * (j + i*N) = &(C[i][j])
 	addq	%rsi, %r11			# r11 = C + L * (i + j*N) = &(C[j][i])
-	movb	(%r10b), %r12		# temp = C[i][j]
-	movb	(%r11b), (%r10b)	# C[i][j] = C[j][i]
-	movb	%r12, (%r11b)		# C[j][i] = temp
+	movl	(%r10d), %r12d		# temp = C[i][j]
+	# C[i][j] = C[j][i]
+	movl	(%r11d), %r13d
+	movl	%r13d, (%r10d)
+	movl	%r12d, (%r11d)		# C[j][i] = temp
 	jmp		nextCol
 
 done:
+	popq	%r13
 	popq	%r12			# restore r12
 	ret
 
@@ -101,25 +106,26 @@ reverseColumns:		# reverses order of columns in NxN matrix C -> %rsi, N -> %edx
 	xorl	%r8d, %r8d		# starts with j = 0
 	pushq	%r12			# want to use callee-saved r12 for temp entry
 	pushq	%r13			# want to use callee-saved r13 for temp arithmetic
+	pushq	%r14			# want to use callee-saved r14 for temp entry
 	# computing N / 2	
-	movb	%dx, %ax			# ax = dividend = N
+	movw	%dx, %ax			# ax = dividend = N
 	movb	$2, %r13b			# r13b = divisor = 2
 	idiv	%r13b				# integer division, al = N / 2, ah = N % 2
 
 # For each row
-rowLoop:
+revRowLoop:
 	movl	$0, %r8d			# column number j in r8d -> j = 0
 	cmpl	%edx, %ecx			# loop as long as i - N < 0
-	jge doneWithRows
+	jge 	rowDone
 
 # For each cell of this row
-colLoop:		# only want to loop thru half the columns as to not overlap
+revColLoop:		# only want to loop thru half the columns as to not overlap
 	cmpb	%al, %r8b			# loop as long as j - N/2 < 0
 	# note: if N is odd, al stores the index before the middle col,
 	# which is fine since the middle col does not require reversing
-	jge doneWithCells
+	jge 	colDone
 
-switchEntries:
+revSwitchEntries:
 	# compute address of C[i][j] and C[i][N-j-1]
 	# r10 and r11 are caller saved, up for free use
 	movl	%edx, %r10d			# r10d = N 
@@ -134,16 +140,19 @@ switchEntries:
 	imull	$1, %r11d			# r11 = L * (N-j-1 + i*N) -> L is char (1 Byte)
 	addq	%rsi, %r10			# r10 = C + L * (j + i*N) = &(C[i][j])
 	addq	%rsi, %r11			# r11 = C + L * (N-j-1 + i*N) = &(C[i][N-j-1])
-	movb	(%r10b), %r12		# temp = C[i][j]
-	movb	(%r11b), (%r10b)	# C[i][j] = C[i][N-j-1]
-	movb	%r12, (%r11b)		# C[i][N-j-1] = temp
-	jmp		colLoop
+	movl	(%r10d), %r12d		# temp = C[i][j]
+	# C[i][j] = C[i][N-j-1]
+	movl	(%r11d), %r14d
+	movl	%r14d, (%r10d)
+	movl	%r12d, (%r11d)		# C[i][N-j-1] = temp
+	jmp	revColLoop
 
-doneWithCells:		# go to next row
+colDone:		# go to next row
 	incl	%ecx			# row number i++ (in ecx)
-	jmp rowLoop				
+	jmp 	revRowLoop				
 
-doneWithRows:
+rowDone:
+	popq	%r14
 	popq	%r13
 	popq	%r12
 	ret
