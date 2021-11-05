@@ -7,7 +7,7 @@ int main() {
 	long y = 3;
 	long z = 4;
 
-	printf("decode2 returns: %li", decode2(x, y, z));
+	printf("decode2 returns: %li\n", decode2(x, y, z));
 
 	return 0;
 }
