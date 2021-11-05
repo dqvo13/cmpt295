@@ -16,7 +16,7 @@ int main() {
     float fval = (float) ival;
     int *pval = &ival;
 
-    printf("word size: %d\n", 8 * sizeof(size_t));
+    printf("word size: %ld\n", 8 * sizeof(size_t));
 
     show_int(ival);
     show_float(fval);
@@ -60,6 +60,8 @@ int main() {
     int getMask4 = mask_LSbits(33);
     int getMask5 = mask_LSbits(2);
     int getMask6 = mask_LSbits(15);
+    int getMask7 = mask_LSbits(64);
+    int getMask8 = mask_LSbits(65);
 
     printf("result of maskLSbits(0): %d\n", getMask1);
     printf("result of maskLSbits(-5): %d\n", getMask2);
@@ -67,6 +69,8 @@ int main() {
     printf("result of maskLSbits(33): %d\n", getMask4);
     printf("result of maskLSbits(2): %d\n", getMask5);
     printf("result of maskLSbits(15): %d\n", getMask6);
+    printf("result of maskLSbits(64): %d\n", getMask7);
+    printf("result of maskLSbits(65): %d\n", getMask8);
 
     return 0;
 

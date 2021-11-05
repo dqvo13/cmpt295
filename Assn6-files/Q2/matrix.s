@@ -85,11 +85,11 @@ switchEntries:
 	imull	$1, %r11d			# r11 = L * (i + j*N) -> L is char (1 Byte)
 	addq	%rdi, %r10			# r10 = C + L * (j + i*N) = &(C[i][j])
 	addq	%rdi, %r11			# r11 = C + L * (i + j*N) = &(C[j][i])
-	movl	(%r10d), %r12d		# temp = C[i][j]
+	movb	(%r10), %r12b		# temp = C[i][j]
 	# C[i][j] = C[j][i]
-	movl	(%r11d), %r13d
-	movl	%r13d, (%r10d)
-	movl	%r12d, (%r11d)		# C[j][i] = temp
+	movb	(%r11), %r13b
+	movb	%r13b, (%r10)
+	movb	%r12b, (%r11)		# C[j][i] = temp
 	jmp		nextCol
 
 done:
@@ -128,23 +128,24 @@ revColLoop:		# only want to loop thru half the columns as to not overlap
 revSwitchEntries:
 	# compute address of C[i][j] and C[i][N-j-1]
 	# r10 and r11 are caller saved, up for free use
-	movl	%esi, %r10d			# r10d = N 
-	movl	%esi, %r11d			# r11d = N 
-    imull	%ecx, %r10d			# r10d = i*N
-    imull	%ecx, %r11d			# r11d = i*N
-	addl	%r8d, %r10d			# r10d = j + i*N
-	addl	%esi, %r11d			# r11d = N + i*N
-	subl	%r8d, %r11d			# r11d = N-j + i*N
-	subl	$1, %r11d			# r11d = N-j-1 + i*N
-	imull	$1, %r10d			# r10 = L * (j + i*N) -> L is char (1 Byte)
-	imull	$1, %r11d			# r11 = L * (N-j-1 + i*N) -> L is char (1 Byte)
-	addq	%rdi, %r10			# r10 = C + L * (j + i*N) = &(C[i][j])
-	addq	%rdi, %r11			# r11 = C + L * (N-j-1 + i*N) = &(C[i][N-j-1])
-	movl	(%r10d), %r12d		# temp = C[i][j]
+	movl	%esi, %r10d		# r10d = N 
+	movl	%esi, %r11d		# r11d = N 
+    	imull	%ecx, %r10d		# r10d = i*N
+    	imull	%ecx, %r11d		# r11d = i*N
+	addl	%r8d, %r10d		# r10d = j + i*N
+	addl	%esi, %r11d		# r11d = N + i*N
+	subl	%r8d, %r11d		# r11d = N-j + i*N
+	subl	$1, %r11d		# r11d = N-j-1 + i*N
+	imull	$1, %r10d		# r10 = L * (j + i*N) -> L is char (1 Byte)
+	imull	$1, %r11d		# r11 = L * (N-j-1 + i*N) -> L is char (1 Byte)
+	addq	%rdi, %r10		# r10 = C + L * (j + i*N) = &(C[i][j])
+	addq	%rdi, %r11		# r11 = C + L * (N-j-1 + i*N) = &(C[i][N-j-1])
+	movb	(%r10), %r12b		# temp = C[i][j]
 	# C[i][j] = C[i][N-j-1]
-	movl	(%r11d), %r14d
-	movl	%r14d, (%r10d)
-	movl	%r12d, (%r11d)		# C[i][N-j-1] = temp
+	movb	(%r11), %r14b
+	movb	%r14b, (%r10)
+	movb	%r12b, (%r11)		# C[i][N-j-1] = temp
+	incl	%r8d			# j++
 	jmp	revColLoop
 
 colDone:		# go to next row
