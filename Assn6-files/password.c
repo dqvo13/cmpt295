@@ -20,7 +20,7 @@ bool IsPasswordOK() {
 	// }
 
 	// print memory address of password
-	printf("Starting address of password is %A", password);
+	printf("Starting address of password is %p\n", password);
 
 	// Echo both passwords
 	printf("actual password is %s\n", goodpwd);
