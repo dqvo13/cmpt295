@@ -82,6 +82,11 @@ printMatrixByRow:
 	.align 8
 .LC2:
 	.string	"Rotating the matrix by 90 degrees clockwise: "
+	.section	.rodata.str1.1
+.LC3:
+	.string	"after transpose:"
+.LC4:
+	.string	"after reversing cols:"
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
 	.globl	main
@@ -109,9 +114,16 @@ main:
 	movl	$4, %esi
 	leaq	C(%rip), %rdi
 	call	transpose@PLT
+	leaq	.LC3(%rip), %rdi
+	call	puts@PLT
+	movl	$4, %esi
+	leaq	C(%rip), %rdi
+	call	printMatrixByRow
 	movl	$4, %esi
 	leaq	C(%rip), %rdi
 	call	reverseColumns@PLT
+	leaq	.LC4(%rip), %rdi
+	call	puts@PLT
 	movl	$4, %esi
 	leaq	C(%rip), %rdi
 	addq	$8, %rsp

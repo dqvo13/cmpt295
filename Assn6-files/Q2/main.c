@@ -32,7 +32,10 @@ void main() {
 
     printf("Rotating the matrix by 90 degrees clockwise: \n");
     transpose(C, N);
+    printf("after transpose:\n");
+    printMatrixByRow(C,N);
     reverseColumns(C, N);
+    printf("after reversing cols:\n");
     printMatrixByRow(C, N);
 
     return;
