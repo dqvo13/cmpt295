@@ -12,7 +12,7 @@
 
 int sumPlus(int *A, int n);
 
-#define N 100
+#define N 200
 #define NTESTS 20
 
 int A[N];
@@ -38,10 +38,35 @@ void main () {
 
     // Run tests
     for (i = 0; i < NTESTS; i++) {
-        getrusage(RUSAGE_SELF, &start);
+        // getrusage(RUSAGE_SELF, &start);
+	
+	asm volatile (
+	"cpuid\n\t"
+	"rdtscp\n\t"
+	"movl %%eax, %0\n\t"
+	: "=r" (start_time)
+	:
+	: "rax", "rbx", "rcx", "rdx"
+	);
+
         P = sumPlus(A, N);
-        getrusage(RUSAGE_SELF, &end);
-        cycles[i] = (end.ru_utime.tv_sec - start.ru_utime.tv_sec) * 1000000 + (end.ru_utime.tv_usec - start.ru_utime.tv_usec);
+        // getrusage(RUSAGE_SELF, &end);
+        // cycles[i] = (end.ru_utime.tv_sec - start.ru_utime.tv_sec) * 1000000 + (end.ru_utime.tv_usec - start.ru_utime.tv_usec);
+	asm volatile (
+	"cpuid\n\t"
+	"rdtscp\n\t"
+	"movl %%eax, %0\n\t"
+	: "=r" (end_time)
+	:
+	: "rax", "rbx", "rcx", "rdx"
+	);
+	cycles[i] = end_time - start_time;
+
+	if (cycles[i] >= 7000) {
+		printf("Sample %d completed in %d clock cycles – DISCARDED.\n", i+1, cycles[i]);
+		i--;
+		continue;
+	}
 
         if (P != Q) {
             perror("Error:  sum mismatch"); return;

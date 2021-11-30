@@ -7,10 +7,12 @@ sumPlus:
 	jle		done
 	xorl	%edx, %edx
 	shl     $2, %rsi
+	xorl	%r8d, %r8d
 loop:
 	movl	(%rdi,%rdx), %ecx
 	testl	%ecx, %ecx
-	jle	    endif
+	#jle	endif
+	cmovl	%r8d, %ecx
 	addl	%ecx, %eax
 endif:
 	addq	$4, %rdx
