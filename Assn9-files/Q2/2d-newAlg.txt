@@ -1,0 +1,19 @@
+search(A[n], target)
+	if n <= 0,return -1
+
+	temp = A[n-1]
+	A[n-1] = target
+
+	if A[0] == target, 
+		A[n-1] = temp
+		return 0
+	else, i = 2, tempInd = 1
+
+	while A[i-1] != target do
+		i++, tempInd++
+
+	A[n-1] = temp
+
+	if tempInd < n-1, return tempInd
+	else if A[n-1] != target, return -1
+	else return n-1

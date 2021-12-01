@@ -1,0 +1,17 @@
+
+cmdSizes.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <cmdSizes>:
+   0:	48 31 c0             	xor    %rax,%rax
+   3:	31 c0                	xor    %eax,%eax
+   5:	48 c7 c0 00 00 00 00 	mov    $0x0,%rax
+   c:	b8 00 00 00 00       	mov    $0x0,%eax
+  11:	83 c0 01             	add    $0x1,%eax
+  14:	67 8d 40 01          	lea    0x1(%eax),%eax
+  18:	ff c0                	inc    %eax
+  1a:	83 c0 08             	add    $0x8,%eax
+  1d:	67 8d 40 08          	lea    0x8(%eax),%eax
+  21:	c3                   	retq   

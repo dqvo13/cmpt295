@@ -6,7 +6,6 @@
 # lsearch_2(int *A, int n, int target)
 # A -> %rdi, n -> %esi, target -> %edx
 lsearch_2:
-.LFB0:
 	.cfi_startproc
 	endbr64
 	testl	%esi, %esi			# if n <= 0
@@ -16,32 +15,26 @@ lsearch_2:
 	movl	(%rax), %r9d			# temp = A[n-1]
 	movl	%edx, (%rax)			# A[n-1] = target
 	cmpl	(%rdi), %edx			# if A[0] == target
-	je	found				# then we're done
-	movl	$1, %ecx
-	.p2align 4,,10
-	.p2align 3
+	je	zeroIndex			# then return i = 0
+	movl	$1, %ecx			# increment i
 loop:
 	movl	%ecx, %r8d			# save i in temp register
 	addq	$1, %rcx			# i++
-	cmpl	%edx, -4(%rdi,%rcx,4)		# if A[i] != target
+	cmpl	%edx, -4(%rdi,%rcx,4)		# if A[i-1] != target
 	jne	loop				# continue while loop
 finish:
-	movl	%r9d, (%rax)
-	leal	-1(%rsi), %eax
-	cmpl	%r8d, %eax
-	jg	.L7
-	cmpl	%edx, %r9d
-	jne	.L2
-	ret
-	.p2align 4,,10
-	.p2align 3
-.L7:
-	movl	%r8d, %eax
-	ret
-	.p2align 4,,10
-	.p2align 3
+	movl	%r9d, (%rax)			# A[n-1] = temp
+	leal	-1(%rsi), %eax			# ret <- n-1
+	cmpl	%r8d, %eax			# if (saved) i < n-1
+	jg	found				# then return (saved) i
+	cmpl	%edx, %r9d			# else if A[n-1] != target
+	jne	notFound			# then return -1
+	ret					# else return n-1
 found:
-	xorl	%r8d, %r8d			# 
+	movl	%r8d, %eax			# ret <- (saved) i
+	ret
+zeroIndex:
+	xorl	%r8d, %r8d			# i = 0
 	jmp	finish
 notFound:
 	movl	$-1, %eax			# return -1
