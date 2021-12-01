@@ -1,0 +1,4 @@
+in the LLsearch, %rax is being updated by the movq instruction but is soon needed in the testq instruction, only 2 lines later in the same .L36 branch. 
+this means there is waiting time for the value in %rax to be forwarded for the processor to start decoding the testq instruction, resulting in extra clock cycles in the form of bubbles. 
+this is the data dependency in LLsearch that causes its execution times to be longer: the data forwarding of %rax causes the delay. 
+in the lsearch on the array, %rax is used in the .L56 branch but isn't changed before being used in the cmpq instruction, so there is no need for bubbles/extra clock cycles. in both searches, there are cmpl instructions that act upon %rax in the following branches but this means there is an even effect in terms of clock cycles, therefore not contributing to why LLsearch takes longer. 
