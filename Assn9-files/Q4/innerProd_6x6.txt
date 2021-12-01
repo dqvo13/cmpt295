@@ -1,0 +1,37 @@
+// k = 6, a = 6
+void inner6x6unrolling(vec_ptr u, vec_ptr v, data_t *dest) {
+	long i;
+	long length = vec_length(u);		// size of vectors
+	data_t *udata = get_vec_start(u);	// array of data_t
+	data_t *vdata = get_vec_start(v);	// array of data_t
+	data_t sum1 = (data_t) 0;		// accumulator 1
+	data_t sum2 = (data_t) 0;		// accumulator 2
+	data_t sum3 = (data_t) 0;		// accumulator 3
+	data_t sum4 = (data_t) 0;		// accumulator 4
+	data_t sum5 = (data_t) 0;		// accumulator 5
+	data_t sum6 = (data_t) 0;		// accumulator 6
+	data_t grandTotal = (data_t) 0;		// sum of sums
+
+	// 6x6 unrolling, add 6 products at a time using 6 accumulators
+	for (i = 0; i < length - 5; i += 6) {
+		sum1 +=	(udata[i] * vdata[i]);
+		sum2 +=	(udata[i+1] * vdata[i+1]);
+		sum3 +=	(udata[i+2] * vdata[i+2]);
+		sum4 +=	(udata[i+3] * vdata[i+3]);
+		sum5 +=	(udata[i+4] * vdata[i+4]);
+		sum6 +=	(udata[i+5] * vdata[i+5]); 
+	}
+
+	grandTotal = sum1 + sum2 + sum3 + sum4 + sum5 + sum6;
+
+	// account for the remainder of elements in udata and vdata,
+	// must add one by one, starting at whatever i we left off in
+	// previous 6x6 loop
+	for (; i < length; i++) {
+		grandTotal += udata[i] * vdata[i]
+	}
+	
+	*dest = grandTotal;
+
+	return;
+}
